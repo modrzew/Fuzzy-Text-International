@@ -47,6 +47,33 @@ static size_t interpolate_and_append(char* buffer, const size_t length,
   return remaining;
 }
 
+/* simple base 10 only itoa, found: http://stackoverflow.com/questions/20435527 */
+char * itoa10 (int value, char *result)
+{
+  char const digit[] = "0123456789";
+  char *p = result;
+  if (value < 0) {
+    *p++ = '-';
+    value *= -1;
+  }
+
+  /* move number of required chars and null terminate */
+  int shift = value;
+  do {
+    ++p;
+    shift /= 10;
+  } while (shift);
+  *p = '\0';
+
+  /* populate result in reverse order */
+  do {
+    *--p = digit [value % 10];
+    value /= 10;
+  } while (value);
+
+  return result;
+}
+
 const char* get_hour(Language lang, int index) {
   switch (lang) {
     case CA:
@@ -131,4 +158,36 @@ void time_to_words(Language lang, int hours, int minutes, int seconds, char* wor
   // Leave one space at the end
   remaining -= append_string(words, remaining, " ");
 
+}
+
+const char* get_day(Language lang, int index) {
+  switch (lang) {
+    default:
+      return DAYS_EN_US[index];
+  }
+}
+
+const char* get_month(Language lang, int index) {
+  switch (lang) {
+    default:
+      return MONTHS_EN_US[index];
+  }
+}
+
+void date_to_words(Language lang, int day, int date, int month, char* words, size_t buffer_size) {
+  size_t remaining = buffer_size;
+  memset(words, 0, buffer_size);
+  
+  const char* stringday = get_day(lang, day);
+  const char* stringmonth = get_month(lang, 3);
+  
+  char stringdate[15];
+  itoa10(date, stringdate);
+  
+  remaining -= append_string(words, remaining, stringday);
+  remaining -= append_string(words, remaining, " ");
+  remaining -= append_string(words, remaining, stringmonth);
+  remaining -= append_string(words, remaining, " ");
+  remaining -= append_string(words, remaining, stringdate);
+  remaining -= append_string(words, remaining, " ");
 }

@@ -54,6 +54,8 @@ static struct tm *t;
 
 static int currentNLines;
 
+static bool showTime = true;
+
 // Animation handler
 static void animationStoppedHandler(struct Animation *animation, bool finished, void *context)
 {
@@ -263,26 +265,77 @@ static void time_to_lines(int hours, int minutes, int seconds, char lines[NUM_LI
 	
 }
 
+// Make a date string
+static void date_to_lines(int day, int date, int month, char lines[NUM_LINES][BUFFER_SIZE], char format[]) {
+  int length = NUM_LINES * BUFFER_SIZE + 1;
+  char dateStr[length];
+  
+  // Empty all lines
+	for (int i = 0; i < NUM_LINES; i++)
+	{
+		lines[i][0] = '\0';
+    format[i] = ' ';
+	}
+  format[2] = 'b';
+  
+  date_to_words(lang, day, date, month, dateStr, length);
+  
+  char *start = dateStr;
+	char *end = strstr(start, " ");
+	int l = 0;
+	while (end != NULL && l < NUM_LINES) {
+    // See if next word fits
+    char *try = strstr(end + 1, " ");
+    if (try != NULL && try - start <= LINE_APPEND_LIMIT)
+    {
+      end = try;
+    }
+
+		// copy to line
+		*end = '\0';
+		strcpy(lines[l++], start);
+
+		// Look for next word
+		start = end + 1;
+		end = strstr(start, " ");
+	}
+}
+
 // Update screen based on new time
 static void display_time(struct tm *t)
 {
-	// The current time text will be stored in the following strings
-	char textLine[NUM_LINES][BUFFER_SIZE];
-	char format[NUM_LINES];
+  // The current time text will be stored in the following strings
+  char textLine[NUM_LINES][BUFFER_SIZE];
+  char format[NUM_LINES];
+  
+  if (showTime) {
+  	time_to_lines(t->tm_hour, t->tm_min, t->tm_sec, textLine, format);
+  } else {
+    date_to_lines(t->tm_wday, t->tm_mday, t->tm_mon, textLine, format);
+  }
+  
+  int nextNLines = configureLayersForText(textLine, format);
 
-	time_to_lines(t->tm_hour, t->tm_min, t->tm_sec, textLine, format);
-	
-	int nextNLines = configureLayersForText(textLine, format);
+  int delay = 0;
+  for (int i = 0; i < NUM_LINES; i++) {
+    if (nextNLines != currentNLines || needToUpdateLine(&lines[i], textLine[i])) {
+      updateLineTo(&lines[i], textLine[i], delay);
+      delay += ANIMATION_STAGGER_TIME;
+    }
+  }
 
-	int delay = 0;
-	for (int i = 0; i < NUM_LINES; i++) {
-		if (nextNLines != currentNLines || needToUpdateLine(&lines[i], textLine[i])) {
-			updateLineTo(&lines[i], textLine[i], delay);
-			delay += ANIMATION_STAGGER_TIME;
-		}
-	}
-	
-	currentNLines = nextNLines;
+  currentNLines = nextNLines;
+}
+
+static void tap_handler(AccelAxisType axis, int32_t direction)
+{ 
+  showTime = !showTime;
+  if (showTime) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Show time");
+  } else {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Show date");  
+  }
+  display_time(t);
 }
 
 static void initLineForStart(Line* line)
@@ -525,6 +578,8 @@ static void handle_init() {
 
 	const bool animated = true;
 	window_stack_push(window, animated);
+  
+  accel_tap_service_subscribe(tap_handler);
 
 	// Subscribe to minute ticks
 	tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
