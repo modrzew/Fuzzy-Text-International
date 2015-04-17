@@ -276,7 +276,7 @@ static void date_to_lines(int day, int date, int month, char lines[NUM_LINES][BU
 		lines[i][0] = '\0';
     format[i] = ' ';
 	}
-  format[2] = 'b';
+  format[0] = 'b';
   
   date_to_words(lang, day, date, month, dateStr, length);
   

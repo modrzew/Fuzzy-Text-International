@@ -185,7 +185,7 @@ void date_to_words(Language lang, int day, int date, int month, char* words, siz
   itoa10(date, stringdate);
   
   remaining -= append_string(words, remaining, stringday);
-  remaining -= append_string(words, remaining, " ");
+  remaining -= append_string(words, remaining, "  ");
   remaining -= append_string(words, remaining, stringmonth);
   remaining -= append_string(words, remaining, " ");
   remaining -= append_string(words, remaining, stringdate);
