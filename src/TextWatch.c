@@ -55,6 +55,7 @@ static struct tm *t;
 static int currentNLines;
 
 static bool showTime = true;
+static int dateTimeout = 0;
 
 // Animation handler
 static void animationStoppedHandler(struct Animation *animation, bool finished, void *context)
@@ -308,8 +309,9 @@ static void display_time(struct tm *t)
   char textLine[NUM_LINES][BUFFER_SIZE];
   char format[NUM_LINES];
   
-  if (showTime) {
+  if (showTime || dateTimeout > 1) {
   	time_to_lines(t->tm_hour, t->tm_min, t->tm_sec, textLine, format);
+    dateTimeout = 0;
   } else {
     date_to_lines(t->tm_wday, t->tm_mday, t->tm_mon, textLine, format);
   }
@@ -376,6 +378,11 @@ static void display_initial_time(struct tm *t)
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed)
 {
 	t = tick_time;
+  
+  if (!showTime) {
+    dateTimeout++;
+  }
+  
 	display_time(tick_time);
 }
 
