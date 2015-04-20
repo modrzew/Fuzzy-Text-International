@@ -312,6 +312,7 @@ static void display_time(struct tm *t)
   if (showTime || dateTimeout > 1) {
   	time_to_lines(t->tm_hour, t->tm_min, t->tm_sec, textLine, format);
     dateTimeout = 0;
+    showTime = true;
   } else {
     date_to_lines(t->tm_wday, t->tm_mday, t->tm_mon, textLine, format);
   }
@@ -330,13 +331,8 @@ static void display_time(struct tm *t)
 }
 
 static void tap_handler(AccelAxisType axis, int32_t direction)
-{ 
+{
   showTime = !showTime;
-  if (showTime) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Show time");
-  } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Show date");  
-  }
   display_time(t);
 }
 
@@ -586,6 +582,8 @@ static void handle_init() {
 	const bool animated = true;
 	window_stack_push(window, animated);
   
+  // Sample as little as often to save battery and no need for precision
+  accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
   accel_tap_service_subscribe(tap_handler);
 
 	// Subscribe to minute ticks

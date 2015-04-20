@@ -48,7 +48,7 @@ static size_t interpolate_and_append(char* buffer, const size_t length,
 }
 
 /* simple base 10 only itoa, found: http://stackoverflow.com/questions/20435527 */
-char * itoa10 (int value, char *result)
+char * itoa10(int value, char *result)
 {
   char const digit[] = "0123456789";
   char *p = result;
