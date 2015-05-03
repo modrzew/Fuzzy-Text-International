@@ -179,7 +179,7 @@ void date_to_words(Language lang, int day, int date, int month, char* words, siz
   memset(words, 0, buffer_size);
   
   const char* stringday = get_day(lang, day);
-  const char* stringmonth = get_month(lang, 3);
+  const char* stringmonth = get_month(lang, month);
   
   char stringdate[15];
   itoa10(date, stringdate);
