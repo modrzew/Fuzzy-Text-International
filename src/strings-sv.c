@@ -38,7 +38,7 @@ const char* const HOURS_SV[] = {
  * A "*" character before a word makes that word bold.
  */
 const char* const RELS_SV[] = {
-  "$1",
+  "*$1",
   "fem över *$1",
   "tio över *$1",
   "kvart över *$1",
