@@ -52,3 +52,26 @@ const char* const RELS_EN_US[] = {
   "five to *$2"
 };
 
+const char* const MONTHS_EN_US[] = {
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "nov",
+  "dec"
+};
+
+const char* const DAYS_EN_US[] = {
+  "sun",
+  "mon",
+  "tue",
+  "wed",
+  "thur",
+  "fri",
+  "sat"
+};
