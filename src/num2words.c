@@ -6,6 +6,7 @@
 #include "strings-es.h"
 #include "strings-fr.h"
 #include "strings-no.h"
+#include "strings-pl.h"
 #include "strings-sv.h"
 #include "string.h"
 
@@ -78,27 +79,40 @@ const char* get_hour(Language lang, int index) {
   switch (lang) {
     case CA:
       return HOURS_CA[index];
-      break;
     case DE:
       return HOURS_DE[index];
-      break;
     case EN_GB:
       return HOURS_EN_GB[index];
-      break;
     case ES:
       return HOURS_ES[index];
-      break;
     case FR:
       return HOURS_FR[index];
-      break;
     case NO:
       return HOURS_NO[index];
-      break;
     case SV:
       return HOURS_SV[index];
-      break;
+    case PL:
+      return HOURS_PL[index];
     default:
       return HOURS_EN_US[index];
+  }
+}
+
+const char* get_hour_genitive(Language lang, int index) {
+  switch (lang) {
+    case PL:
+      return HOURS_PL_GENITIVE[index];
+    default:
+      return get_hour(lang, index);
+  }
+}
+
+int is_genitive(Language lang, int index) {
+  switch (lang) {
+    case PL:
+      return RELS_PL_GENITIVE[index];
+    default:
+      return 0;
   }
 }
 
@@ -106,25 +120,20 @@ const char* get_rel(Language lang, int index) {
   switch (lang) {
     case CA:
       return RELS_CA[index];
-      break;
     case DE:
       return RELS_DE[index];
-      break;
     case EN_GB:
       return RELS_EN_GB[index];
-      break;
     case ES:
       return RELS_ES[index];
-      break;
     case FR:
       return RELS_FR[index];
-      break;
     case NO:
       return RELS_NO[index];
-      break;
     case SV:
       return RELS_SV[index];
-      break;
+    case PL:
+      return RELS_PL[index];
     default:
       return RELS_EN_US[index];
   }
@@ -149,9 +158,16 @@ void time_to_words(Language lang, int hours, int minutes, int seconds, char* wor
     hour_index = hours % 24;
   }
 
-  const char* hour = get_hour(lang, hour_index);
-  const char* next_hour = get_hour(lang, (hour_index + 1) % 24);
   const char* rel  = get_rel(lang, rel_index);
+  const char* hour;
+  const char* next_hour;
+  if (is_genitive(lang, rel_index)) {
+    hour = get_hour_genitive(lang, hour_index);
+    next_hour = get_hour_genitive(lang, (hour_index + 1) % 24);
+  } else {
+    hour = get_hour(lang, hour_index);
+    next_hour = get_hour(lang, (hour_index + 1) % 24);
+  }
 
   remaining -= interpolate_and_append(words, remaining, rel, hour, next_hour);
 
